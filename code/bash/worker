@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "starting worker with input=$INPUT_QUEUE, timeout=$TIMEOUT, output=$OUTPUT_QUEUE"
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  date_function="date +%s%0N" # in redis image
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  date_function="gdate +%s%0N" # in macos
+fi
+
+REDIS_HOST=${REDIS_HOST:-localhost}
+
+while :
+do
+  res=$(redis-cli -h $REDIS_HOST --json blpop $INPUT_QUEUE $TIMEOUT)
+  start=$(($($date_function)/1000000))
+  json=$(echo $res | jq 'nth(1; .[]) | fromjson')
+  md5=$(echo $json | jq -r '.file' | base64 --decode | md5sum | awk '{print $1}')
+  end=$(($($date_function)/1000000))
+  output=$(echo $json | jq -c '. += {"md5": "'$md5'", "flavor": "bash", "elapsed": '$(($end-$start))'}')
+  redis-cli -h $REDIS_HOST lpush $OUTPUT_QUEUE "$output" > /dev/null 2>&1 
+done

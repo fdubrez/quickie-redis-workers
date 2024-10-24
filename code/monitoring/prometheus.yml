@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 5s #Scrape interval to every 5 seconds.
+  evaluation_interval: 5s #Evaluate rules every 5 seconds.
+  
+scrape_configs:
+  # - job_name: "prometheus"
+  #   # metrics_path defaults to '/metrics'
+  #   static_configs:
+  #     - targets: ["quickie-prometheus:9090"]
+      
+  - job_name: "quickie-exporter"
+    # metrics_path defaults to '/metrics'
+    static_configs:
+      - targets: ["quickie-exporter:3000"]
+
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["quickie-cadvisor:8080"]

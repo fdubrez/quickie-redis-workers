@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/night.css">
+	<link rel="stylesheet" href="dist/slides.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	<script src="plugin/highlight/highlight.js"></script>
+</head>
+
+<!-- <body></body> style="display: flex;"> -->
+	<div class="reveal">
+		<div class="slides">
+			<section data-background-image="./dist/img/intro.png">
+			</section>
+			<section>
+				<section>
+					<div style="display: flex;">
+						<img src="./dist/img/fdu.png" alt="logo" style="width: 15rem; height: auto; border-radius: 50%;"/>
+						<div>
+							<ul style="list-style-type: none;">
+								<li class="fragment">Dev back & co-directeur technique @maxds</li>
+								<li class="fragment">Flexitarien à tendance carnivore</li>
+								<li class="fragment">fan de Deno</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3>Sujet du jour</h3>
+				</section>
+				<section>
+					<div class="mermaid">
+					  <pre>
+						flowchart TD
+							redis[(Redis)]
+							worker-->|blpop|redis
+							worker-->|save JSON with md5|redis
+					  </pre>
+					</div>
+				</section>
+				<section>
+					<h3>Prétextes</h3>
+					<ul>
+						<li class="fragment fade-in-then-semi-out">pocer plusieurs stacks</li>
+						<li class="fragment fade-in-then-semi-out">comparer</li>
+						<li class="fragment fade-in-then-semi-out">la performance</li>
+						<li class="fragment fade-in-then-semi-out">l'empreinte mémoire</li>
+						<li class="fragment fade-in-then-semi-out">la "simplicité"</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Disclaimer</h3>
+				</section>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js-mermaid-plugin@2.3.0/plugin/mermaid/mermaid.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+
+			// mermaid initialize config
+			mermaid: {
+			// flowchart: {
+			//   curve: 'linear',
+			// },
+			},
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMermaid]
+		});
+		// Change the size of our presentation
+		//document.querySelector('.reveal').style.width = '60vw';
+
+		// Make reveal.js aware of the size change
+		Reveal.layout();
+	</script>
+</body>
+
+</html>

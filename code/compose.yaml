@@ -1,0 +1,106 @@
+services:
+  redis:
+    container_name: quickie-redis
+    image: 'redislabs/redismod'
+    platform: linux/amd64
+    ports:
+      - '6379:6379'
+  exporter:
+    container_name: quickie-exporter
+    image: 'denoland/deno:alpine'
+    ports:
+      - '3000:3000'
+    volumes:
+      - "./exporter/main.js:/tmp/main.js:ro"
+    entrypoint: ["deno", "run", "-A", "/tmp/main.js"]
+    env_file: .env
+    depends_on:
+      - redis
+  bash:
+    container_name: quickie-bash
+    image: 'docker.io/library/quickie:bash'
+    volumes:
+      - "./bash/worker:/tmp/worker:ro"
+    env_file: .env
+    depends_on:
+      - redis
+  deno:
+    container_name: quickie-deno
+    image: 'denoland/deno:alpine'
+    volumes:
+      - "./deno/main.ts:/tmp/main.ts:ro"
+    entrypoint: ["deno", "run", "-A", "/tmp/main.ts"]
+    env_file: .env
+    depends_on:
+      - redis
+  python:
+    container_name: quickie-python
+    image: 'docker.io/library/quickie:python'
+    volumes:
+      - "./python/main.py:/app/main.py:ro"
+    entrypoint: ["python3", "/app/main.py"]
+    env_file: .env
+    depends_on:
+      - redis
+  rust:
+    container_name: quickie-rust
+    image: 'docker.io/library/quickie:rust'
+    #env_file: .env
+    depends_on:
+      - redis
+  dotnetcore:
+    container_name: quickie-dotnetcore
+    image: 'docker.io/library/quickie:dotnetcore'
+    env_file: .env
+    depends_on:
+      - redis
+
+  cadvisor:
+    container_name: quickie-cadvisor
+    image: gcr.io/cadvisor/cadvisor
+    # network_mode: "host"
+    ports:
+      - "8080:8080"
+    volumes: 
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:ro"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+      - "/dev/disk/:/dev/disk:ro"
+    privileged: true
+    devices: 
+      - "/dev/kmsg"
+    # entrypoint: ["/usr/bin/cadvisor", "-logtostderr", "--store_container_labels=false", "--whitelisted_container_labels=com.docker.compose.service"]
+
+  prometheus:
+    container_name: quickie-prometheus
+    image: prom/prometheus:latest
+    # network_mode: "host"
+    ports:
+      - "9090:9090"
+    volumes: 
+      - "./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml"
+    privileged: true
+    depends_on:
+      - cadvisor
+
+  grafana:
+    container_name: quickie-grafana
+    image: grafana/grafana:latest
+    # network_mode: "host"
+    ports:
+      - "5000:3000"
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - DS_PROMETHEUS=prometheus
+    volumes: 
+      - "grafana-data:/var/lib/grafana"
+      - "./monitoring/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml"
+      - "./monitoring/dashboard.json:/var/lib/grafana/dashboards/dashboard.json"
+      - "./monitoring/default.yaml:/etc/grafana/provisioning/dashboards/default.yaml"
+    privileged: true
+    depends_on:
+      - prometheus
+
+volumes:
+  grafana-data:
